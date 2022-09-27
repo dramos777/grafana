@@ -1,0 +1,45 @@
+version: '3.9'
+services:
+  grafana:
+    image: grafana/grafana-oss
+    user: "0"
+    environment:
+    - GF_INSTALL_PLUGINS=alexanderzobnin-zabbix-app
+    ports:
+    - "3000:3000"
+    volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/timezone:/etc/timezone:ro
+    - ./gf/var/lib/grafana/:/var/lib/grafana/
+    - ./gf/var/log/grafana/:/var/log/grafana/
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.2'
+          memory: 512M
+    networks:
+      net_backend:
+        aliases:
+        - net-web-nginx
+        - net-database
+      net_frontend:
+    stop_grace_period: 30s
+networks:
+  net_frontend:
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default 
+      config:
+      - subnet: 172.16.241.0/24
+  net_backend:
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    internal: true
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.242.0/24
